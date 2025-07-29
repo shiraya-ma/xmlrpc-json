@@ -1,0 +1,31 @@
+{
+  "name": "@shiraya-ma/xmlrpc-json",
+  "description": "XML-RPC JSON",
+  "version": "0.0.0",
+  "author": "shiraya-ma <138377007+shiraya-ma@users.noreply.github.com> (https://www.shiraya.ma/)",
+  "bugs": {
+    "url": "https://github.com/shiraya-ma/xmlrpc-json/issues"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "fixpack": "^4.0.0"
+  },
+  "keywords": [
+    "json",
+    "xmlrpc",
+    "xmlrpc-json"
+  ],
+  "license": "MIT",
+  "module": "index.ts",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shiraya-ma/xmlrpc-json.git"
+  },
+  "scripts": {
+    "fix-package": "fixpack"
+  },
+  "type": "module"
+}
