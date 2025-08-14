@@ -136,7 +136,7 @@ describe('parse', () => {
     expect(() => parse(tokens)).toThrowError('Mismatched closing tag: </a> but got </b>');
   });
   
-  it('should hundle unclosed tag (invalid)', () => {
+  it('should handle unclosed tag (invalid)', () => {
     const tokens: Token[] = [
       { type: 'open', name: 'root', attributes: {} }
     ];
