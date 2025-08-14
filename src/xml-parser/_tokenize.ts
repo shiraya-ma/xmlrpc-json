@@ -44,9 +44,10 @@ export function tokenize (xml: string) {
         const attrRegex = /([a-zA-Z0-9_:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
         let match: RegExpExecArray | null = null;
         while ((match = attrRegex.exec(attributesString)) !== null) {
-          type MatchPattern = [string, string, string, string];
-          const [, key, value1, value2 ] = match as unknown as MatchPattern;
-          attributes[key] = value1 ?? value2;
+          const [, key, value1, value2] = match;
+          if (key) {
+            attributes[key] = (value1 ?? value2)!;
+          }
         }
 
         const openToken: OpenTagToken = {
