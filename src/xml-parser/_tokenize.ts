@@ -28,27 +28,38 @@ export function tokenize (xml: string) {
       }
       // open tag
       else {
-        const closeIndex = xml.indexOf('>', pos);
-        const withClose = xml[closeIndex - 1] === '/';
-        
-        const closePos = withClose? closeIndex - 1: closeIndex;
+        const endIndex = xml.indexOf('>', pos);
+        const isSelfClosing = xml[endIndex - 1] === '/';
 
-        const name = xml.slice(pos + 1, closePos).trim();
+        const tagContentEnd = isSelfClosing ? endIndex - 1 : endIndex;
+        const rawTagContent = xml.slice(pos + 1, tagContentEnd);
+
+        const firstSpaceIndex = rawTagContent.search(/\s/);
+
+        const name = firstSpaceIndex === -1 ? rawTagContent : rawTagContent.slice(0, firstSpaceIndex);
+        const attributesString = firstSpaceIndex === -1 ? '' : rawTagContent.slice(firstSpaceIndex);
+
+        const attributes: Record<string, string> = {};
+
+        const attrRegex = /([a-zA-Z0-9_:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
+        let match: RegExpExecArray | null = null;
+        while ((match = attrRegex.exec(attributesString)) !== null) {
+          type MatchPattern = [string, string, string, string];
+          const [, key, value1, value2 ] = match as unknown as MatchPattern;
+          attributes[key] = value1 ?? value2;
+        }
+
         const openToken: OpenTagToken = {
           type: 'open',
           name,
+          attributes,
         };
         tokens.push(openToken);
 
-        if (withClose) {
-          const closeTag: CloseTagToken = {
-            type: 'close',
-            name,
-          };
-          tokens.push(closeTag);
+        if (isSelfClosing) {
+          tokens.push({ type: 'close', name });
         }
-
-        pos = closeIndex + 1;
+        pos = endIndex + 1;
       }
     }
 

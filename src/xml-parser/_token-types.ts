@@ -4,6 +4,7 @@
 export type OpenTagToken = {
   type: 'open';
   name: string;
+  attributes: Record<string, string>;
 };
 
 /** @internal */
