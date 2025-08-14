@@ -6,8 +6,13 @@
   "bugs": {
     "url": "https://github.com/shiraya-ma/xmlrpc-json/issues"
   },
+  "dependencies": {
+    "typescript-eslint": "^8.39.1"
+  },
   "devDependencies": {
+    "@eslint/js": "^9.33.0",
     "@types/bun": "latest",
+    "eslint": "^9.33.0",
     "fixpack": "^4.0.0"
   },
   "keywords": [
@@ -25,7 +30,9 @@
     "url": "https://github.com/shiraya-ma/xmlrpc-json.git"
   },
   "scripts": {
-    "fix-package": "fixpack"
+    "fix-package": "fixpack",
+    "lint": "eslint .",
+    "test": "bun test"
   },
   "type": "module"
 }
