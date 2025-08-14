@@ -36,7 +36,7 @@ export function parse (tokens: Token[]): XMLNode[] {
     else if (token.type === 'content') {
       if (stack.length === 0) throw new Error(`Content "${token.content}" found outside of a root element`);
 
-      stack[stack.length - 1]!.children = stack[stack.length - 1]!.children.concat(token.content);
+      stack[stack.length - 1]!.children.push(token.content);
     }
   });
 
