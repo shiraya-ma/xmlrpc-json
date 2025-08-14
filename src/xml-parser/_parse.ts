@@ -24,7 +24,7 @@ export function parse (tokens: Token[]): XMLNode[] {
       if (node.name !== token.name) throw new Error(`Mismatched closing tag: </${node.name}> but got </${token.name}>`);
 
       if (stack.length > 0) {
-        stack[stack.length - 1]!.children = stack[stack.length - 1]!.children.concat(node);
+        stack[stack.length - 1]!.children.push(node);
       }
       else if (rootNodes.length > 0) {
         throw new Error('Multiple root elements are not allowed');
