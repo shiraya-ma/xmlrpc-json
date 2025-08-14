@@ -79,6 +79,47 @@ describe('parse', () => {
       },
     ]);
   });
+
+  it('should parse with single attribute', () => {
+    const tokens: Token[] = [
+      { type: 'open', name: 'greet', attributes: { attribute: 'value' } },
+      { type: 'content', content: 'hello' },
+      { type: 'close', name: 'greet' }
+    ];
+    const nodes = parse(tokens);
+    expect(nodes).toStrictEqual([
+      {
+        name: 'greet',
+        attributes: {
+          attribute: 'value',
+        },
+        children: [
+          'hello',
+        ],
+      },
+    ]);
+  });
+
+  it('should parse with multiple attributes', () => {
+    const tokens: Token[] = [
+      { type: 'open', name: 'greet', attributes: { hoge: 'hogehoge', fuga: 'fugafuga' } },
+      { type: 'content', content: 'hello' },
+      { type: 'close', name: 'greet' }
+    ];
+    const nodes = parse(tokens);
+    expect(nodes).toStrictEqual([
+      {
+        name: 'greet',
+        attributes: {
+          hoge: 'hogehoge',
+          fuga: 'fugafuga',
+        },
+        children: [
+          'hello',
+        ],
+      },
+    ]);
+  });
   
   it('should handle content outside root element (invalid)', () => {
     const tokens: Token[] = [
