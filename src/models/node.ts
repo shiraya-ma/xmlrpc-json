@@ -1,5 +1,6 @@
 'use strict';
-import { Document, Element } from './_tmp';
+import { Element } from './element';
+import { Document } from './_tmp';
 
 /** @internal */
 export const _SET_PARENT_KEY = Symbol('setParent');
