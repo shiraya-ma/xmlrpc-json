@@ -3,3 +3,4 @@
 export * from './comment';
 export * from './declaration';
 export * from './node';
+export * from './text';
