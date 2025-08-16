@@ -1,7 +1,7 @@
 'use strict';
 import { describe, expect, it } from 'bun:test';
 
-import { _SET_PARENT_KEY, Node, type NodeConstructorOptions, type NodeType } from './node';
+import { _SET_PARENT_KEY, assertNeverNodeType, Node, type NodeConstructorOptions, type NodeType } from './node';
 import type { Document } from './_tmp';
 
 describe('Node', () => {
@@ -91,5 +91,12 @@ describe('Node', () => {
     expect(clonedNode.rootDocument).toBe(originalNode.rootDocument);
     expect(clonedNode.deepValue).not.toBe(originalNode.deepValue);
     expect(clonedNode.deepValue).toEqual(originalNode.deepValue);
+  });
+});
+
+describe('assertNeverNodeType', () => {
+  it('should throw error', () => {
+    expect(() => assertNeverNodeType('hello' as never))
+      .toThrowError('Unexpected node type: hello');
   });
 });

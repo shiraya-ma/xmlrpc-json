@@ -27,3 +27,7 @@ export type NodeConstructorOptions = Partial<{
   namespaceURI: string | null;
   rootDocument: Document;
 }>;
+
+export function assertNeverNodeType (type: never): never {
+  throw new Error("Unexpected node type: " + (type as unknown));
+};
