@@ -51,7 +51,7 @@ export class Element extends Node {
   /** @override */
   public cloneNode (deep?: boolean): Element {
     const children = deep? this._children.map(child => child.cloneNode(true)): [...this._children];
-    const attributes = JSON.parse(JSON.stringify(this._attribute));
+    const attributes = { ...this._attribute };
 
     const element = new Element({
       // Node
