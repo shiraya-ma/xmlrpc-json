@@ -32,10 +32,11 @@ export class DeclarationElement extends Node {
       // Node
       namespaceURI: this.namespaceURI,
       rootDocument: this.rootDocument ?? undefined,
-      attributes: this._attributes,
+      attributes: { ...this._attributes },
     });
 
     return declaration;
+  };
   };
 
   public getAttribute (name: string): string | null {
