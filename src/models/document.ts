@@ -29,6 +29,7 @@ export class Document extends Node {
 
     this.namespaceURI = options.namespaceURI ?? null;
     this.rootDocument = this;
+    this._children = options.children ?? [];
   };
 
   /** @override */
