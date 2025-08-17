@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import { CommentNode } from './comment';
-import type { Document } from './_tmp';
+import type { Document } from './document';
 
 describe('CommentNode', () => {
   it('should initialize CommentNode', () => {
