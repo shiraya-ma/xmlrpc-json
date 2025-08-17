@@ -9,7 +9,7 @@ describe('CommentNode', () => {
     const dummyDocument = {} as Document;
 
     const comment = new CommentNode({
-      namespaceURI: 'https://example.com/commnet/node',
+      namespaceURI: 'https://example.com/comment/node',
       rootDocument: dummyDocument,
       nodeValue: 'hello',
     });
