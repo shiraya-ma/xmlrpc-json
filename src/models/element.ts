@@ -90,7 +90,7 @@ export class Element extends Node {
     if (referenceNode !== null) {
       index = this._children.indexOf(referenceNode);
       if (index < 0) {
-        throw new Error(`${referenceNode.nodeType} is not exist in <${this.tagName}>`);
+        throw new Error(`${referenceNode.nodeType} does not exist in <${this.tagName}>`);
       }
     }
 
