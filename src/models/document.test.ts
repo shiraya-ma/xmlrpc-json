@@ -62,7 +62,7 @@ describe('Document', () => {
     expect(clonedDoc.namespaceURI).toBe(originalDoc.namespaceURI);
     expect(clonedDoc.rootDocument).toBe(clonedDoc);
 
-    expect(clonedDoc.children).not.toStrictEqual(originalDoc.children);
+    expect(clonedDoc.children).toStrictEqual(originalDoc.children);
     clonedDoc.children.forEach((clonedhild, index) => {
       expect(clonedhild).toBe(originalDoc.children[index]!);
     });
@@ -93,7 +93,7 @@ describe('Document', () => {
     expect(clonedDoc.namespaceURI).toBe(originalDoc.namespaceURI);
     expect(clonedDoc.rootDocument).toBe(clonedDoc);
 
-    expect(clonedDoc.children).not.toStrictEqual(originalDoc.children);
+    expect(clonedDoc.children).toStrictEqual(originalDoc.children);
     clonedDoc.children.forEach((clonedhild, index) => {
       expect(clonedhild).not.toBe(originalDoc.children[index]!);
     });
