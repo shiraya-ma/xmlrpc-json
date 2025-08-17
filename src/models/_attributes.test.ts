@@ -28,7 +28,7 @@ describe('attributes', () => {
     expect(value).toBeTrue();
   });
 
-  it('should find attribute value', () => {
+  it('should not find attribute value', () => {
     const value = _hasAttribute({
       dummy: 'value',
     }, 'attr');
