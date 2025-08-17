@@ -117,14 +117,12 @@ export class Element extends Node {
     return _hasAttribute(this._attributes, name);
   };
 
-  public setAttribute (name: string, value: string): Attributes {
+  public setAttribute (name: string, value: string): void {
     this._attributes = _setAttribute(this._attributes, name, value);
-    return this._attributes;
   };
 
-  public removeAttribute (name: string): Attributes {
+  public removeAttribute (name: string): void {
     this._attributes = _removeAttribute(this._attributes, name);
-    return this._attributes;
   }
 };
 
