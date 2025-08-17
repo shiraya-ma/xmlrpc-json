@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 
 import { Element } from './element';
-import type { Document } from './_tmp';
+import type { Document } from './document';
 import { TextNode } from './text';
 import type { Attributes } from './_attributes';
 

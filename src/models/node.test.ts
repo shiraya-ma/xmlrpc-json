@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import { _SET_PARENT_KEY, assertNeverNodeType, Node, type NodeConstructorOptions, type NodeType } from './node';
-import type { Document } from './_tmp';
+import type { Document } from './document';
 
 describe('Node', () => {
   type TempNodeConstructorObject = NodeConstructorOptions & {

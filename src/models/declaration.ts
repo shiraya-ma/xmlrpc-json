@@ -1,6 +1,6 @@
 'use strict';
 import { Node, type NodeConstructorOptions } from "./node";
-import type { Document } from "./_tmp";
+import type { Document } from "./document";
 import { _getAttribute, _hasAttribute, _removeAttribute, _setAttribute, type Attributes } from "./_attributes";
 
 export class DeclarationElement extends Node {

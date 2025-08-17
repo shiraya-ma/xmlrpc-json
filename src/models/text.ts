@@ -1,6 +1,6 @@
 'use strict';
 import { Node, type NodeConstructorOptions } from "./node";
-import type { Document } from "./_tmp";
+import type { Document } from "./document";
 
 export class TextNode extends Node {
   /** @override */

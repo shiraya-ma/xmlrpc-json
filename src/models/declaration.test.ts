@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import { DeclarationElement } from './declaration';
-import { Document } from './_tmp';
+import { Document } from './document';
 import type { Attributes } from './_attributes';
 
 describe('DeclarationElement', () => {

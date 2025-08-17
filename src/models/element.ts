@@ -1,6 +1,6 @@
 'use strict';
 import { _SET_PARENT_KEY, Node, type NodeConstructorOptions } from "./node";
-import type { Document } from "./_tmp";
+import type { Document } from "./document";
 import { _hasAttribute, type Attributes } from "./_attributes";
 
 export class Element extends Node {

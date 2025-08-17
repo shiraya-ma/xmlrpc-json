@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import { TextNode } from './text';
-import type { Document } from './_tmp';
+import type { Document } from './document';
 
 describe('TextNode', () => {
   it('should initialize TextNode', () => {
