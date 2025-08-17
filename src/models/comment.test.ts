@@ -15,14 +15,14 @@ describe('CommentNode', () => {
     });
 
     expect(comment.nodeType).toStrictEqual('Comment');
-    expect(comment.namespaceURI).toStrictEqual('https://example.com/commnet/node');
+    expect(comment.namespaceURI).toStrictEqual('https://example.com/comment/node');
     expect(comment.rootDocument).toBe(dummyDocument);
     expect(comment.nodeValue).toStrictEqual('hello');
   });
 
   it('should clone CommentNode', () => {
     const originalComment = new CommentNode({
-      namespaceURI: 'https://example.com/commnet/node',
+      namespaceURI: 'https://example.com/comment/node',
       rootDocument: undefined,
       nodeValue: 'hello',
     });
@@ -38,7 +38,7 @@ describe('CommentNode', () => {
 
   it('should not change from null is cloned nodeValue', () => {
     const originalComment = new CommentNode({
-      namespaceURI: 'https://example.com/commnet/node',
+      namespaceURI: 'https://example.com/comment/node',
       rootDocument: undefined,
       nodeValue: null,
     });
