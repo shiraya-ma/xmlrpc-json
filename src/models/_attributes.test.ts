@@ -36,7 +36,7 @@ describe('attributes', () => {
     expect(value).toBeFalse();
   });
 
-  it('should get null for undefined attribute valute', () => {
+  it('should get null for undefined attribute value', () => {
     const value = _getAttribute({
       attr: 'value',
     }, 'invalid');
