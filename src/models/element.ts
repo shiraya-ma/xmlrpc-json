@@ -1,7 +1,7 @@
 'use strict';
 import { _SET_PARENT_KEY, Node, type NodeConstructorOptions } from "./node";
 import type { Document } from "./document";
-import { _hasAttribute, type Attributes } from "./_attributes";
+import { _getAttribute, _hasAttribute, _removeAttribute, _setAttribute, type Attributes } from "./_attributes";
 
 export class Element extends Node {
   /** @override */
@@ -23,9 +23,9 @@ export class Element extends Node {
     return this._children;
   };
 
-  private _attribute: Attributes;
+  private _attributes: Attributes;
   get attributes () {
-    return this._attribute;
+    return this._attributes;
   };
 
   constructor (options: ElementConstructorOptions) {
@@ -35,7 +35,7 @@ export class Element extends Node {
     this.namespaceURI = options.namespaceURI ?? null;
     this.rootDocument = options.rootDocument ?? null;
     this._children = options.children ?? [];
-    this._attribute = options.attributes ?? {};
+    this._attributes = options.attributes ?? {};
 
     if (/:/.test(this.tagName)) {
       const [prefix, ...nodes] = this.tagName.split(/:/g);
@@ -51,7 +51,7 @@ export class Element extends Node {
   /** @override */
   public cloneNode (deep?: boolean): Element {
     const children = deep? this._children.map(child => child.cloneNode(true)): [...this._children];
-    const attributes = { ...this._attribute };
+    const attributes = { ...this._attributes };
 
     const element = new Element({
       // Node
@@ -110,28 +110,22 @@ export class Element extends Node {
   };
 
   public getAttribute (name: string): string | null {
-    return this._attribute[name] ?? null;
+    return _getAttribute(this._attributes, name);
   };
 
   public hasAttribute (name: string): boolean {
-    return _hasAttribute(this._attribute, name);
+    return _hasAttribute(this._attributes, name);
   };
 
-  public setAttribute (name: string, value: string) {
-    this._attribute[name] = value;
+  public setAttribute (name: string, value: string): Attributes {
+    this._attributes = _setAttribute(this._attributes, name, value);
+    return this._attributes;
   };
 
-  public removeAttribute (name: string) {
-    const attributes: Attributes = {};
-
-    Object.keys(this._attribute).forEach(key => {
-      if (key === name) return;
-
-      attributes[key] = this._attribute[key]!;
-    });
-
-    this._attribute = attributes;
-  };
+  public removeAttribute (name: string): Attributes {
+    this._attributes = _removeAttribute(this._attributes, name);
+    return this._attributes;
+  }
 };
 
 export type ElementConstructorOptions = NodeConstructorOptions & {

@@ -11,13 +11,8 @@ export function _hasAttribute (attr: Attributes, name: string): boolean {
 };
 
 export function _removeAttribute (attrs: Attributes, name: string): Attributes {
-  const attributes: Attributes = {};
-  Object.keys(attrs).forEach(key => {
-    if (key !== name) {
-      attributes[key] = attrs[key]!;
-    }
-  });
-  
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  const { [name]: _, ...attributes } = attrs;
   return attributes;
 };
 
