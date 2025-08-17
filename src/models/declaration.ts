@@ -37,7 +37,6 @@ export class DeclarationElement extends Node {
 
     return declaration;
   };
-  };
 
   public getAttribute (name: string): string | null {
     return _getAttribute(this._attributes, name);
