@@ -334,7 +334,7 @@ describe('Element', () => {
     expect(() => {
       element.insertBefore(hello, dummy)
     })
-      .toThrowError('Text is not exist in <element>');
+      .toThrowError('Text does not exist in <element>');
   });
   
   it('should return attribute value', () => {

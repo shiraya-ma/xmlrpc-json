@@ -300,7 +300,7 @@ describe('Document', () => {
     expect(() => {
       document.insertBefore(hello, dummy)
     })
-      .toThrowError('Text is not exist in document');
+      .toThrowError('Text does not exist in document');
   });
 
   describe('Document.createNode', () => {
