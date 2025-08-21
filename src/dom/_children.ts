@@ -35,3 +35,33 @@ export function __guardCirclerReference (parent: WithChildren<Node>, child: Node
     _parent = _parent.parentNode;
   };
 };
+
+/**
+ * Guards against invalid document root elements.
+ * 
+ * @throws DOMException
+ * @internal
+ */
+export function __guardDocumentRoot (parent: WithChildren<Node>, child: Node) {
+  // TODO
+  // Document実装後に解除
+  const parentIsDocument = false; // parent instanceof Document;
+  // TODO
+  // TextNode実装後に解除
+  const childIsTextNode = false; // child instanceof TextNode;
+  // TODO
+  // DeclarationElement 実装後に解除
+  const childIsDeclaration = true; // child instanceof DeclarationElement;
+
+  if (parentIsDocument && childIsTextNode) {
+    throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `Document cannot have a TextNode as a direct child.`);
+  }
+
+  if (childIsDeclaration && !parentIsDocument) {
+    throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `DeclarationElement can only be a direct child of a Document.`);
+  }
+
+  if (childIsDeclaration && parentIsDocument && parent.children.indexOf(child) > 0) {
+    throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `A DeclarationElement must be the first node in a Document.`);
+  }
+}

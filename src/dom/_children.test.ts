@@ -40,4 +40,18 @@ describe('guard functions', () => {
       .toThrowError('HierarchyRequestError: The new child is an ancestor of the parent.');
     });
   });
+
+  describe('__guardDocumentRoot', () => {
+    it.todo('should success if parent is document and child is not text node', () => {});
+
+    it.todo('should success if parent is not document and child is text node', () => {});
+
+    it.todo('should success if parent is document and first child is declaration element', () => {});
+
+    it.todo('should throw DOMException error if text node`s parent is document', () => {});
+
+    it.todo('should throw DOMException error if eclaration element`s parent is not document', () => {});
+
+    it.todo('should throw DOMException error if parent is document and first child is not declaration element', () => {});
+  });
 });
