@@ -21,7 +21,7 @@ export abstract class Node {
 
   public abstract cloneNode (deep?: boolean): Node;
 
-  [_SET_PARENT_KEY](node: Node | null) {
+  [_SET_PARENT_KEY](node: WithChildren<Node> | null) {
     this._parentNode = node;
   }
 };
