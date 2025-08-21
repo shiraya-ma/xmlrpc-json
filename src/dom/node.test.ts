@@ -30,6 +30,12 @@ describe('Node', () => {
       });
     };
   };
+  
+  it('should set parentNode from constructor options', () => {
+    const dummyParent = {} as WithChildren<Node>;
+    const node = new TestNode({ parentNode: dummyParent });
+    expect(node.parentNode).toBe(dummyParent);
+  });
 
   it('should set parent', () => {
     const node = new TestNode();
