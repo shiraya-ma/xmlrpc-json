@@ -1,9 +1,12 @@
 'use strict';
 import { describe, expect, it } from 'bun:test';
 
-import type { Node } from './node';
-
-import { __guardCirclerReference, type WithChildren } from './_children';
+import {
+  __guardCirclerReference,
+  __guardNodeType,
+  type WithChildren
+} from './_children';
+import { Node } from './node';
 
 describe('guard functions', () => {
   describe('__guardCirclerReference', () => {
@@ -53,5 +56,34 @@ describe('guard functions', () => {
     it.todo('should throw DOMException error if eclaration element`s parent is not document', () => {});
 
     it.todo('should throw DOMException error if parent is document and first child is not declaration element', () => {});
+  });
+
+  describe('__guardNodeType', () => {
+    class TempNode extends Node {
+      public readonly nodeType = 'TempNode' as unknown as never;
+      public readonly rootDocument = null;
+      public readonly namespaceURI = null;
+
+      constructor () {
+        super({});
+      }
+
+      public cloneNode (): TempNode {
+        return this;
+      }
+    };
+
+    it('should success if node is instance of Node', () => {
+      const node = new TempNode();
+
+      expect(__guardNodeType(node)).toBeUndefined();
+    });
+
+    it('should throw DOMException error if node is instance of Node', () => {
+      const node = {} as Node;
+
+      expect(() => {__guardNodeType(node)})
+      .toThrow('HierarchyRequestError: The node is not an instance of Node.');
+    });
   });
 });

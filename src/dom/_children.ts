@@ -1,6 +1,6 @@
 'use strict';
 import { DOMException } from "./errors";
-import type { Node, NodeConstructorOptions } from "./node";
+import { Node, type NodeConstructorOptions } from "./node";
 
 export type WithChildren<T = {}> = T & {
   children: Node[];
@@ -65,3 +65,15 @@ export function __guardDocumentRoot (parent: WithChildren<Node>, child: Node) {
     throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `A DeclarationElement must be the first node in a Document.`);
   }
 }
+
+/**
+ * Ensures that the given node is an instance of `Node`.
+ * 
+ * @throws DOMException
+ * @internal
+ */
+export function __guardNodeType (node: Node): void {
+  if (!(node instanceof Node)) {
+    throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `The node is not an instance of Node.`);
+  }
+};
