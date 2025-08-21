@@ -16,7 +16,7 @@ export abstract class Node {
   };
 
   constructor (options: NodeConstructorOptions) {
-    this._parentNode = options.rootDocument ?? null;
+    this._parentNode = options.parentNode ?? null;
   };
 
   public abstract cloneNode (deep?: boolean): Node;
