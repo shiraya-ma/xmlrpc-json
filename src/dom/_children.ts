@@ -1,6 +1,6 @@
 'use strict';
 import { DOMException } from "./errors";
-import { Node, type NodeConstructorOptions } from './node';
+import { _SET_PARENT_KEY, Node, type NodeConstructorOptions } from "./node";
 
 export type Children = Node[];
 
@@ -11,6 +11,27 @@ export type WithChildren<T = {}> = T & {
   removeChild: RemoveChildFunction<Node>;
   replaceChild: ReplaceChildFunction<Node, Node>;
   insertBefore: InsertBeforeFunction<Node, Node>;
+};
+
+/** @internal */
+export const _appendChild = (parent: WithChildren<Node>, child: Node): Children => {
+  __guardParent(parent);
+  __guardNodeType(child);
+  __guardDocumentRoot(parent, child);
+  __guardCirclerReference(parent, child);
+
+  if (child.parentNode) { 
+    child.parentNode.removeChild(child);
+  }
+
+  const children: Children = [
+    ...parent.children,
+    child,
+  ];
+
+  child[_SET_PARENT_KEY](parent);
+
+  return children;
 };
 
 
@@ -54,7 +75,7 @@ export function __guardDocumentRoot (parent: WithChildren<Node>, child: Node) {
   const childIsTextNode = false; // child instanceof TextNode;
   // TODO
   // DeclarationElement 実装後に解除
-  const childIsDeclaration = true; // child instanceof DeclarationElement;
+  const childIsDeclaration = false; // child instanceof DeclarationElement;
 
   if (parentIsDocument && childIsTextNode) {
     throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `Document cannot have a TextNode as a direct child.`);

@@ -1,5 +1,5 @@
 'use strict';
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it, jest } from 'bun:test';
 
 import {
   __guardCirclerReference,
@@ -7,9 +7,118 @@ import {
   __guardNull,
   __guardParent,
   __guardParentHasChild,
-  type WithChildren
+  _appendChild,
+  type AppendChildFunction,
+  type Children,
+  type RemoveChildFunction,
+  type ReplaceChildFunction,
+  type WithChildren,
+  type WithChildrenNodeConstructorOptions
 } from './_children';
-import { Node } from './node';
+import { Node, type NodeConstructorOptions } from './node';
+
+describe('children functions', () => {
+  const mockAppendChild = jest.fn();
+  const mockRemoveChild = jest.fn();
+  const mockReplaceChild = jest.fn();
+  const mockInsertBefore = jest.fn();
+
+  type ParentNodeConstructorOptions = WithChildrenNodeConstructorOptions;
+
+  class ParentNode extends Node implements WithChildren<Node> {
+    public readonly nodeType = 'ParentNode' as unknown as never;
+    public readonly namespaceURI = null;
+    public readonly rootDocument = null;
+
+    private _children: Children;
+    get children (): Node[] {
+      return this._children;
+    };
+
+    public appendChild: AppendChildFunction<Node>;
+    public removeChild: RemoveChildFunction<Node>;
+    public replaceChild: ReplaceChildFunction<Node, Node>;
+    public insertBefore: ReplaceChildFunction<Node, Node>;
+
+    constructor (options: ParentNodeConstructorOptions) {
+      super(options);
+      this._children = options.children ?? [];
+
+      this.appendChild = mockAppendChild;
+      this.removeChild = mockRemoveChild;
+      this.replaceChild = mockReplaceChild;
+      this.insertBefore = mockInsertBefore;
+    };
+
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    public cloneNode (_?: boolean): ParentNode {
+      return this;
+    };
+  };
+
+  class ChildNode extends Node {
+    public readonly nodeType = 'ChildNode' as unknown as never;
+    public readonly namespaceURI = null;
+    public readonly rootDocument = null;
+
+    constructor (options: NodeConstructorOptions) {
+      super(options);
+    };
+
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    public cloneNode (_?: boolean): ChildNode {
+      return this;
+    };
+  };
+
+  describe('_appendChild', () => {
+    it('should append child to parent', () => {
+      const altChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [ altChild ],
+      });
+
+      const child = new ChildNode({});
+
+      const children = _appendChild(parent, child);
+
+      expect(children).toEqual([ altChild, child ]);
+    });
+
+    it('should append child to parent as first child', () => {
+      const parent = new ParentNode({
+        children: [],
+      });
+
+      const child = new ChildNode({});
+
+      const children = _appendChild(parent, child);
+
+      expect(children).toEqual([ child ]);
+    });
+
+    it('should append child to parent and remove from previous parent', () => {
+      const altParent = new ParentNode({});
+
+      const child = new ChildNode({
+        parentNode: altParent,
+      });
+
+      const parent = new ParentNode({
+        children: [],
+      });
+
+      expect(child.parentNode).toEqual(altParent);
+
+      const children = _appendChild(parent, child);
+
+      expect(children).toEqual([ child ]);
+      expect(child.parentNode).toEqual(parent);
+      expect(altParent.removeChild).toBeCalledWith(child);
+    });
+  });
+});
 
 describe('guard functions', () => {
   describe('__guardCirclerReference', () => {
