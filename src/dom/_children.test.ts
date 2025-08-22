@@ -1,5 +1,5 @@
 'use strict';
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it, jest } from 'bun:test';
 
 import {
   __guardCirclerReference,
@@ -7,9 +7,255 @@ import {
   __guardNull,
   __guardParent,
   __guardParentHasChild,
-  type WithChildren
+  _appendChild,
+  _insertBefore,
+  _removeChild,
+  _replaceChild,
+  type AppendChildFunction,
+  type Children,
+  type RemoveChildFunction,
+  type ReplaceChildFunction,
+  type WithChildren,
+  type WithChildrenNodeConstructorOptions
 } from './_children';
-import { Node } from './node';
+import { _SET_PARENT_KEY, Node, type NodeConstructorOptions } from './node';
+
+describe('children functions', () => {
+  const mockAppendChild = jest.fn();
+  const mockRemoveChild = jest.fn();
+  const mockReplaceChild = jest.fn();
+  const mockInsertBefore = jest.fn();
+
+  type ParentNodeConstructorOptions = WithChildrenNodeConstructorOptions;
+
+  class ParentNode extends Node implements WithChildren<Node> {
+    public readonly nodeType = 'ParentNode' as unknown as never;
+    public readonly namespaceURI = null;
+    public readonly rootDocument = null;
+
+    private _children: Children;
+    get children (): Node[] {
+      return this._children;
+    };
+
+    public appendChild: AppendChildFunction<Node>;
+    public removeChild: RemoveChildFunction<Node>;
+    public replaceChild: ReplaceChildFunction<Node, Node>;
+    public insertBefore: ReplaceChildFunction<Node, Node>;
+
+    constructor (options: ParentNodeConstructorOptions) {
+      super(options);
+      this._children = options.children ?? [];
+
+      this.appendChild = mockAppendChild;
+      this.removeChild = mockRemoveChild;
+      this.replaceChild = mockReplaceChild;
+      this.insertBefore = mockInsertBefore;
+    };
+
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    public cloneNode (_?: boolean): ParentNode {
+      return this;
+    };
+  };
+
+  class ChildNode extends Node {
+    public readonly nodeType = 'ChildNode' as unknown as never;
+    public readonly namespaceURI = null;
+    public readonly rootDocument = null;
+
+    constructor (options: NodeConstructorOptions) {
+      super(options);
+    };
+
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    public cloneNode (_?: boolean): ChildNode {
+      return this;
+    };
+  };
+
+  describe('_appendChild', () => {
+    it('should append child to parent', () => {
+      const altChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [ altChild ],
+      });
+
+      const child = new ChildNode({});
+
+      const children = _appendChild(parent, child);
+
+      expect(children).toEqual([ altChild, child ]);
+    });
+
+    it('should append child to parent as first child', () => {
+      const parent = new ParentNode({
+        children: [],
+      });
+
+      const child = new ChildNode({});
+
+      const children = _appendChild(parent, child);
+
+      expect(children).toEqual([ child ]);
+    });
+
+    it('should append child to parent and remove from previous parent', () => {
+      const altParent = new ParentNode({});
+
+      const child = new ChildNode({
+        parentNode: altParent,
+      });
+
+      const parent = new ParentNode({
+        children: [],
+      });
+
+      expect(child.parentNode).toEqual(altParent);
+
+      const children = _appendChild(parent, child);
+
+      expect(children).toEqual([ child ]);
+      expect(child.parentNode).toEqual(parent);
+      expect(altParent.removeChild).toBeCalledWith(child);
+    });
+  });
+
+  describe('_removeChild', () => {
+    it('should remove child from parent', () => {
+      const altChild = new ChildNode({});
+      const child = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [ child, altChild ],
+      });
+
+      altChild[_SET_PARENT_KEY](parent);
+      child[_SET_PARENT_KEY](parent);
+
+      expect(child.parentNode).toBe(parent);
+
+      const children = _removeChild(parent, child);
+
+      expect(children).toEqual([ altChild ]);
+      expect(child.parentNode).toBeNull();
+    });
+
+    it('should return empty array if last child is removed from parent', () => {
+      const child = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [ child ],
+      });
+
+      child[_SET_PARENT_KEY](parent);
+
+      expect(child.parentNode).toBe(parent);
+
+      const children = _removeChild(parent, child);
+
+      expect(children).toEqual([]);
+      expect(child.parentNode).toBeNull();
+    });
+  });
+
+  describe('_replaceChild', () => {
+    it('should replaceChild with newChild', () => {
+      const altParent = new ParentNode({});
+
+      const oldChild = new ChildNode({});
+      const newChild = new ChildNode({
+        parentNode: altParent,
+      });
+
+      const parent = new ParentNode({
+        children: [ oldChild ],
+      });
+
+      oldChild[_SET_PARENT_KEY](parent);
+
+      expect(oldChild.parentNode).toBe(parent);
+      expect(newChild.parentNode).toBe(altParent);
+
+      const children = _replaceChild(parent, newChild, oldChild);
+
+      expect(children).toEqual([ newChild ]);
+
+      expect(oldChild.parentNode).toBeNull();
+      expect(newChild.parentNode).toBe(parent);
+      expect(altParent.removeChild).toBeCalledWith(newChild);
+    });
+  });
+
+  describe('_insertBefore', () => {
+    it('should insert newChild as the first child', () => {
+      const altParent = new ParentNode({});
+
+      const firstChild = new ChildNode({
+        parentNode: altParent,
+      });
+      const secondChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [
+          secondChild,
+        ],
+      });
+
+      expect(firstChild.parentNode).toBe(altParent);
+
+      const children = _insertBefore(parent, firstChild, secondChild);
+
+      expect(children).toEqual([ firstChild, secondChild ]);
+      expect(firstChild.parentNode).toBe(parent);
+      expect(altParent.removeChild).toBeCalledWith(firstChild);
+    });
+
+    it('should insert newChild in the middle of children list', () => {
+      const firstChild = new ChildNode({});
+      const secondChild = new ChildNode({});
+      const thirdChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [
+          firstChild,
+          thirdChild,
+        ],
+      });
+
+      expect(secondChild.parentNode).toBeNull();
+
+      const children = _insertBefore(parent, secondChild, thirdChild);
+
+      expect(children).toEqual([ firstChild, secondChild, thirdChild ]);
+      expect(secondChild.parentNode).toBe(parent);
+    });
+
+    it('should do nothing if newChild and referenceChild are the same', () => {
+      const firstChild = new ChildNode({});
+      const secondChild = new ChildNode({});
+      const thirdChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [
+          firstChild,
+          secondChild,
+          thirdChild,
+        ],
+      });
+
+      secondChild[_SET_PARENT_KEY](parent);
+
+      expect(secondChild.parentNode).toBe(parent);
+
+      const children = _insertBefore(parent, secondChild, secondChild);
+
+      expect(children).toEqual([ firstChild, secondChild, thirdChild ]);
+      expect(secondChild.parentNode).toBe(parent);
+    });
+  });
+});
 
 describe('guard functions', () => {
   describe('__guardCirclerReference', () => {

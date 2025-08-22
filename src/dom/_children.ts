@@ -1,6 +1,6 @@
 'use strict';
 import { DOMException } from "./errors";
-import { Node, type NodeConstructorOptions } from './node';
+import { _SET_PARENT_KEY, Node, type NodeConstructorOptions } from "./node";
 
 export type Children = Node[];
 
@@ -13,6 +13,85 @@ export type WithChildren<T = {}> = T & {
   insertBefore: InsertBeforeFunction<Node, Node>;
 };
 
+/** @internal */
+export const _appendChild = (parent: WithChildren<Node>, child: Node): Children => {
+  __guardParent(parent);
+  __guardNodeType(child);
+  __guardDocumentRoot(parent, child);
+  __guardCirclerReference(parent, child);
+
+  if (child.parentNode) { 
+    child.parentNode.removeChild(child);
+  }
+
+  const children: Children = [
+    ...parent.children,
+    child,
+  ];
+
+  child[_SET_PARENT_KEY](parent);
+
+  return children;
+};
+
+/** @internal */
+export const _removeChild = (parent: WithChildren<Node>, child: Node): Children => {
+  __guardNull(child);
+  __guardParent(parent);
+  __guardParentHasChild(parent, child);
+
+  const children: Children = parent.children.filter(node => node !== child);
+
+  child[_SET_PARENT_KEY](null);
+  
+  return children;
+};
+
+/** @internal */
+export const _replaceChild = (parent: WithChildren<Node>, newChild: Node, oldChild: Node): Children => {
+  __guardParent(parent);
+  __guardParentHasChild(parent, oldChild);
+  __guardCirclerReference(parent, newChild);
+  __guardDocumentRoot(parent, newChild);
+
+  if (newChild.parentNode) { 
+    newChild.parentNode.removeChild(newChild);
+  }
+
+  const children: Children = parent.children.map(node => node === oldChild? newChild: node);
+
+  newChild[_SET_PARENT_KEY](parent);
+  oldChild[_SET_PARENT_KEY](null);
+
+  return children;
+};
+
+/** @internal */
+export const _insertBefore = (parent: WithChildren<Node>, newChild: Node, referenceChild: Node): Children => {
+  __guardParent(parent);
+  __guardParentHasChild(parent, referenceChild);
+  __guardCirclerReference(parent, newChild);
+  __guardDocumentRoot(parent, newChild);
+
+  if (newChild === referenceChild) {
+    return parent.children;
+  }
+
+  if (newChild.parentNode) { 
+    newChild.parentNode.removeChild(newChild);
+  }
+
+  const refIndex = parent.children.indexOf(referenceChild);
+  const children = [
+    ...parent.children.slice(0, refIndex),
+    newChild,
+    ...parent.children.slice(refIndex),
+  ];
+
+  newChild[_SET_PARENT_KEY](parent);
+
+  return children;
+};
 
 export type AppendChildFunction<AChild extends Node> = (aChild: AChild) => AChild;
 export type RemoveChildFunction<AChild extends Node> = (aChild: AChild) => void;
@@ -54,7 +133,7 @@ export function __guardDocumentRoot (parent: WithChildren<Node>, child: Node) {
   const childIsTextNode = false; // child instanceof TextNode;
   // TODO
   // DeclarationElement 実装後に解除
-  const childIsDeclaration = true; // child instanceof DeclarationElement;
+  const childIsDeclaration = false; // child instanceof DeclarationElement;
 
   if (parentIsDocument && childIsTextNode) {
     throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `Document cannot have a TextNode as a direct child.`);
