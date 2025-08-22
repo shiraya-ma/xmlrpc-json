@@ -8,6 +8,7 @@ import {
   __guardParent,
   __guardParentHasChild,
   _appendChild,
+  _insertBefore,
   _removeChild,
   _replaceChild,
   type AppendChildFunction,
@@ -184,6 +185,74 @@ describe('children functions', () => {
       expect(oldChild.parentNode).toBeNull();
       expect(newChild.parentNode).toBe(parent);
       expect(altParent.removeChild).toBeCalledWith(newChild);
+    });
+  });
+
+  describe('_insertBefore', () => {
+    it('should insert newChild as the first child', () => {
+      const altParent = new ParentNode({});
+
+      const firstChild = new ChildNode({
+        parentNode: altParent,
+      });
+      const secondChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [
+          secondChild,
+        ],
+      });
+
+      expect(firstChild.parentNode).toBe(altParent);
+
+      const children = _insertBefore(parent, firstChild, secondChild);
+
+      expect(children).toEqual([ firstChild, secondChild ]);
+      expect(firstChild.parentNode).toBe(parent);
+      expect(altParent.removeChild).toBeCalledWith(firstChild);
+    });
+
+    it('should insert newChild in the middle of children list', () => {
+      const firstChild = new ChildNode({});
+      const secondChild = new ChildNode({});
+      const thirdChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [
+          firstChild,
+          thirdChild,
+        ],
+      });
+
+      expect(secondChild.parentNode).toBeNull();
+
+      const children = _insertBefore(parent, secondChild, thirdChild);
+
+      expect(children).toEqual([ firstChild, secondChild, thirdChild ]);
+      expect(secondChild.parentNode).toBe(parent);
+    });
+
+    it('should do nothing if newChild and referenceChild are the same', () => {
+      const firstChild = new ChildNode({});
+      const secondChild = new ChildNode({});
+      const thirdChild = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [
+          firstChild,
+          secondChild,
+          thirdChild,
+        ],
+      });
+
+      secondChild[_SET_PARENT_KEY](parent);
+
+      expect(secondChild.parentNode).toBe(parent);
+
+      const children = _insertBefore(parent, secondChild, secondChild);
+
+      expect(children).toEqual([ firstChild, secondChild, thirdChild ]);
+      expect(secondChild.parentNode).toBe(parent);
     });
   });
 });

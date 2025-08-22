@@ -66,6 +66,33 @@ export const _replaceChild = (parent: WithChildren<Node>, newChild: Node, oldChi
   return children;
 };
 
+/** @internal */
+export const _insertBefore = (parent: WithChildren<Node>, newChild: Node, referenceChild: Node): Children => {
+  __guardParent(parent);
+  __guardParentHasChild(parent, referenceChild);
+  __guardCirclerReference(parent, newChild);
+  __guardDocumentRoot(parent, newChild);
+
+  if (newChild === referenceChild) {
+    return parent.children;
+  }
+
+  if (newChild.parentNode) { 
+    newChild.parentNode.removeChild(newChild);
+  }
+
+  const refIndex = parent.children.indexOf(referenceChild);
+  const children = [
+    ...parent.children.slice(0, refIndex),
+    newChild,
+    ...parent.children.slice(refIndex),
+  ];
+
+  newChild[_SET_PARENT_KEY](parent);
+
+  return children;
+};
+
 export type AppendChildFunction<AChild extends Node> = (aChild: AChild) => AChild;
 export type RemoveChildFunction<AChild extends Node> = (aChild: AChild) => void;
 export type ReplaceChildFunction<NewChild extends Node, OldChild extends Node> = (newChild: NewChild, oldChild: OldChild) => NewChild;
