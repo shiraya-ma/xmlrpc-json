@@ -77,3 +77,15 @@ export function __guardNodeType (node: Node): void {
     throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `The node is not an instance of Node.`);
   }
 };
+
+/**
+ * Ensures that the given node is not null.
+ * 
+ * @throws TypeError
+ * @internal
+ */
+export function __guardNull (node: Node): void {
+  if (node === null) {
+    throw new TypeError('The node is null.');
+  };
+};

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'bun:test';
 import {
   __guardCirclerReference,
   __guardNodeType,
+  __guardNull,
   type WithChildren
 } from './_children';
 import { Node } from './node';
@@ -84,6 +85,35 @@ describe('guard functions', () => {
 
       expect(() => {__guardNodeType(node)})
       .toThrow('HierarchyRequestError: The node is not an instance of Node.');
+    });
+  });
+
+  describe('__guardNull', () => {
+    class TempNode extends Node {
+      public readonly nodeType = 'TempNode' as unknown as never;
+      public readonly rootDocument = null;
+      public readonly namespaceURI = null;
+
+      constructor () {
+        super({});
+      }
+
+      public cloneNode (): TempNode {
+        return this;
+      }
+    };
+
+    it('should success if node is not null', () => {
+      const node = new TempNode();
+
+      expect(__guardNull(node)).toBeUndefined();
+    });
+
+    it('should throw DOMException error if node is null', () => {
+      const node = null as unknown as Node;
+
+      expect(() => {__guardNull(node)})
+      .toThrow('The node is null');
     });
   });
 });
