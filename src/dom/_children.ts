@@ -47,6 +47,24 @@ export const _removeChild = (parent: WithChildren<Node>, child: Node): Children 
   return children;
 };
 
+/** @internal */
+export const _replaceChild = (parent: WithChildren<Node>, newChild: Node, oldChild: Node): Children => {
+  __guardParent(parent);
+  __guardParentHasChild(parent, oldChild);
+  __guardCirclerReference(parent, newChild);
+  __guardDocumentRoot(parent, newChild);
+
+  if (newChild.parentNode) { 
+    newChild.parentNode.removeChild(newChild);
+  }
+
+  const children: Children = parent.children.map(node => node === oldChild? newChild: node);
+
+  newChild[_SET_PARENT_KEY](parent);
+  oldChild[_SET_PARENT_KEY](null);
+
+  return children;
+};
 
 export type AppendChildFunction<AChild extends Node> = (aChild: AChild) => AChild;
 export type RemoveChildFunction<AChild extends Node> = (aChild: AChild) => void;

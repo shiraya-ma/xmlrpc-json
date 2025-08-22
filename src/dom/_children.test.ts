@@ -9,6 +9,7 @@ import {
   __guardParentHasChild,
   _appendChild,
   _removeChild,
+  _replaceChild,
   type AppendChildFunction,
   type Children,
   type RemoveChildFunction,
@@ -139,7 +140,7 @@ describe('children functions', () => {
       expect(children).toEqual([ altChild ]);
       expect(child.parentNode).toBeNull();
     });
-    
+
     it('should return empty array if last child is removed from parent', () => {
       const child = new ChildNode({});
 
@@ -155,6 +156,34 @@ describe('children functions', () => {
 
       expect(children).toEqual([]);
       expect(child.parentNode).toBeNull();
+    });
+  });
+
+  describe('_replaceChild', () => {
+    it('should replaceChild with newChild', () => {
+      const altParent = new ParentNode({});
+
+      const oldChild = new ChildNode({});
+      const newChild = new ChildNode({
+        parentNode: altParent,
+      });
+
+      const parent = new ParentNode({
+        children: [ oldChild ],
+      });
+
+      oldChild[_SET_PARENT_KEY](parent);
+
+      expect(oldChild.parentNode).toBe(parent);
+      expect(newChild.parentNode).toBe(altParent);
+
+      const children = _replaceChild(parent, newChild, oldChild);
+
+      expect(children).toEqual([ newChild ]);
+
+      expect(oldChild.parentNode).toBeNull();
+      expect(newChild.parentNode).toBe(parent);
+      expect(altParent.removeChild).toBeCalledWith(newChild);
     });
   });
 });
