@@ -5,6 +5,7 @@ import {
   __guardCirclerReference,
   __guardNodeType,
   __guardNull,
+  __guardParent,
   type WithChildren
 } from './_children';
 import { Node } from './node';
@@ -114,6 +115,71 @@ describe('guard functions', () => {
 
       expect(() => {__guardNull(node)})
       .toThrow('The node is null');
+    });
+  });
+
+  describe('__guardParent', () => {
+    it('should success if parent has property `children`', () => {
+      class TempNode extends Node implements WithChildren<Node> {
+        public readonly nodeType = 'TempNode' as unknown as never;
+        public readonly rootDocument = null;
+        public readonly namespaceURI = null;
+
+        public readonly children: Node[] = [];
+        public appendChild (child: Node): Node {
+          return child;
+        };
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+        public removeChild (_: Node): void {};
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+        public replaceChild (newChild: Node, _: Node): Node {
+          return newChild;
+        };
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+        public insertBefore (newChild: Node, _: Node): Node {
+          return newChild;
+        };
+
+        constructor () {
+          super({});
+        }
+
+        public cloneNode (): TempNode {
+          return this;
+        }
+      };
+
+      const node = new TempNode();
+
+      expect(__guardParent(node)).toBeUndefined();
+    });
+
+    it('should throw DOMException error if parent is not instance of Node', () => {
+      const node = { children: [] as Node[] } as WithChildren<Node>;
+
+      expect(() => {__guardParent(node)})
+      .toThrow('HierarchyRequestError: The parent node is not a valid parent.');
+    });
+
+    it('should throw DOMException error if parent has not property `children`', () => {
+      class TempNode extends Node {
+        public readonly nodeType = 'TempNode' as unknown as never;
+        public readonly rootDocument = null;
+        public readonly namespaceURI = null;
+
+        constructor () {
+          super({});
+        }
+
+        public cloneNode (): TempNode {
+          return this;
+        }
+      };
+
+      const node = new TempNode() as unknown as WithChildren<Node>;
+
+      expect(() => {__guardParent(node)})
+      .toThrow('HierarchyRequestError: The parent node is not a valid parent.');
     });
   });
 });

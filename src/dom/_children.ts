@@ -1,23 +1,26 @@
 'use strict';
 import { DOMException } from "./errors";
-import { Node, type NodeConstructorOptions } from "./node";
+import { Node, type NodeConstructorOptions } from './node';
+
+export type Children = Node[];
 
 export type WithChildren<T = {}> = T & {
-  children: Node[];
+  children: Children;
 
-  appendChild: AppendChildFunction;
-  removeChild: RemoveChildFunction;
-  replaceChild: ReplaceChildFunction;
-  insertBefore: InsertBeforeFunction;
+  appendChild: AppendChildFunction<Node>;
+  removeChild: RemoveChildFunction<Node>;
+  replaceChild: ReplaceChildFunction<Node, Node>;
+  insertBefore: InsertBeforeFunction<Node, Node>;
 };
 
-export type AppendChildFunction = (node: Node) => WithChildren<Node>;
-export type RemoveChildFunction = (node: Node) => WithChildren<Node>;
-export type ReplaceChildFunction = (newNode: Node, oldNode: Node) => WithChildren<Node>;
-export type InsertBeforeFunction = (newNode: Node, refNode: Node) => WithChildren<Node>;
+
+export type AppendChildFunction<AChild extends Node> = (aChild: AChild) => AChild;
+export type RemoveChildFunction<AChild extends Node> = (aChild: AChild) => void;
+export type ReplaceChildFunction<NewChild extends Node, OldChild extends Node> = (newChild: NewChild, oldChild: OldChild) => NewChild;
+export type InsertBeforeFunction<NewChild extends Node, ReferenceChild extends Node> = (newChild: NewChild, referenceChild: ReferenceChild) => NewChild;
 
 export type WithChildrenNodeConstructorOptions = NodeConstructorOptions & Partial<{
-  children: Node[];
+  children: Children;
 }>;
 
 /**
@@ -88,4 +91,19 @@ export function __guardNull (node: Node): void {
   if (node === null) {
     throw new TypeError('The node is null.');
   };
+};
+
+/**
+ * Ensures that the given node can be a parent (i.e., can have children).
+ * 
+ * @throws DOMException
+ * @internal
+ */
+export function __guardParent (node: WithChildren<Node>): void {
+  const nodeIsNode = node instanceof Node;
+  const nodeHasChildren = 'children' in node;
+
+  if (nodeIsNode && nodeHasChildren) return;
+
+  throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `The parent node is not a valid parent.`);
 };
