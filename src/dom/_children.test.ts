@@ -8,6 +8,7 @@ import {
   __guardParent,
   __guardParentHasChild,
   _appendChild,
+  _removeChild,
   type AppendChildFunction,
   type Children,
   type RemoveChildFunction,
@@ -15,7 +16,7 @@ import {
   type WithChildren,
   type WithChildrenNodeConstructorOptions
 } from './_children';
-import { Node, type NodeConstructorOptions } from './node';
+import { _SET_PARENT_KEY, Node, type NodeConstructorOptions } from './node';
 
 describe('children functions', () => {
   const mockAppendChild = jest.fn();
@@ -116,6 +117,44 @@ describe('children functions', () => {
       expect(children).toEqual([ child ]);
       expect(child.parentNode).toEqual(parent);
       expect(altParent.removeChild).toBeCalledWith(child);
+    });
+  });
+
+  describe('_removeChild', () => {
+    it('should remove child from parent', () => {
+      const altChild = new ChildNode({});
+      const child = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [ child, altChild ],
+      });
+
+      altChild[_SET_PARENT_KEY](parent);
+      child[_SET_PARENT_KEY](parent);
+
+      expect(child.parentNode).toBe(parent);
+
+      const children = _removeChild(parent, child);
+
+      expect(children).toEqual([ altChild ]);
+      expect(child.parentNode).toBeNull();
+    });
+    
+    it('should return empty array if last child is removed from parent', () => {
+      const child = new ChildNode({});
+
+      const parent = new ParentNode({
+        children: [ child ],
+      });
+
+      child[_SET_PARENT_KEY](parent);
+
+      expect(child.parentNode).toBe(parent);
+
+      const children = _removeChild(parent, child);
+
+      expect(children).toEqual([]);
+      expect(child.parentNode).toBeNull();
     });
   });
 });

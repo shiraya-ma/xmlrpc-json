@@ -34,6 +34,19 @@ export const _appendChild = (parent: WithChildren<Node>, child: Node): Children 
   return children;
 };
 
+/** @internal */
+export const _removeChild = (parent: WithChildren<Node>, child: Node): Children => {
+  __guardNull(child);
+  __guardParent(parent);
+  __guardParentHasChild(parent, child);
+
+  const children: Children = parent.children.filter(node => node !== child);
+
+  child[_SET_PARENT_KEY](null);
+  
+  return children;
+};
+
 
 export type AppendChildFunction<AChild extends Node> = (aChild: AChild) => AChild;
 export type RemoveChildFunction<AChild extends Node> = (aChild: AChild) => void;
