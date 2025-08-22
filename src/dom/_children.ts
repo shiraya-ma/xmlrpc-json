@@ -107,3 +107,15 @@ export function __guardParent (node: WithChildren<Node>): void {
 
   throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `The parent node is not a valid parent.`);
 };
+
+/**
+ * Ensures that the parent element contains the specified child element.
+ * 
+ * @throws DOMException
+ * @internal
+ */
+export function __guardParentHasChild (parent: WithChildren<Node>, child: Node) {
+  if (!parent.children.includes(child)) {
+    throw new DOMException(DOMException.HIERARCHY_REQUEST_ERROR, `The parent does not contain the child.`);
+  }
+};

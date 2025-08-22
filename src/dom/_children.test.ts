@@ -6,6 +6,7 @@ import {
   __guardNodeType,
   __guardNull,
   __guardParent,
+  __guardParentHasChild,
   type WithChildren
 } from './_children';
 import { Node } from './node';
@@ -180,6 +181,25 @@ describe('guard functions', () => {
 
       expect(() => {__guardParent(node)})
       .toThrow('HierarchyRequestError: The parent node is not a valid parent.');
+    });
+  });
+
+  describe('__guardParentHasChild', () => {
+    it('should success if parent has property `children`', () => {
+      const child = {} as Node;
+
+      const parent = { children: [child] } as WithChildren<Node>;
+
+      expect(__guardParentHasChild(parent, child)).toBeUndefined();
+    });
+
+    it('should throw DOMException error if parent is not instance of Node', () => {
+      const child = {} as Node;
+
+      const parent = { children: [] as Node[] } as WithChildren<Node>;
+
+      expect(() => {__guardParentHasChild(parent, child)})
+      .toThrow('HierarchyRequestError: The parent does not contain the child.');
     });
   });
 });
